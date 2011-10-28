@@ -49,9 +49,9 @@ Methods
 
 Params:
 
-* list_id (required)
-* name (required)
-* date (optional, in unix timestamp format) 
+* list_id (string, required)
+* name (string, required)
+* date (string, optional, in unix timestamp format) 
 
 Usage:
 
@@ -61,8 +61,56 @@ Usage:
 		
 		$wunderlist = new Wunderlist("your_email", "your_password");
 	
-		add_task("list_id", "My new task name", "1323415672");
+		$wunderlist->add_task("list_id", "My new task name", "1323415672");
 	
 	?>
 	
-If no errors occur, the function will return the id of inserted task, otherwise it will return a string: "error"
+If no error occurs, the function will return the id of inserted task, otherwise it will return a string: "error"
+
+### Delete task
+
+Params:
+
+* task_id (string, required)
+* list_id (string, required)
+
+Usage:
+	
+	<?php
+	
+		include "wunderlist.php";
+		
+		$wunderlist = new Wunderlist("your_email", "your_password");
+	
+		$wunderlist->delete_task("task_id", "list_id");
+	
+	?>
+
+Function will return "success" or "error"
+
+### Update task
+
+Params:
+
+* task_id (string, required)
+* params (array, required. Possible array keys are: "name", "note", "date" and "important")
+
+All values of params must be string not integer!
+You have to pass at least array key, all keys are optional.
+
+Usage:
+	
+	<?php
+	
+		include "wunderlist.php";
+		
+		$wunderlist = new Wunderlist("your_email", "your_password");
+	
+		$wunderlist->update_task("task_id", array(
+			"name" => "New Name", 
+			"note" => "Some note", 
+			"date" => "1323415672",
+			"important" => "1"
+		));
+	
+	?>
