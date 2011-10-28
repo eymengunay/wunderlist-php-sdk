@@ -122,6 +122,7 @@ Usage:
 It will return an associative array with "overdue" and "today" keys
 
 Params:
+
 * No params required
 
 Usage:
@@ -141,6 +142,7 @@ Usage:
 It will return an integer that shows no. of tasks in given list
 
 Params:
+
 * list_id (string, required)
 
 Usage:
@@ -154,3 +156,105 @@ Usage:
 		$wunderlist->count_list("list_id");
 	
 	?>
+	
+### Get Lists
+
+Returns an array of all available lists
+
+Params:
+
+* No params required
+
+Usage:
+	
+	<?php
+	
+		include "wunderlist.php";
+		
+		$wunderlist = new Wunderlist("your_email", "your_password");
+	
+		$wunderlist->get_lists();
+	
+	?>
+	
+Example Output:
+
+	Array
+	(
+		[0] => Array
+			(
+				[name] => Inbox
+				[id] => 1234567
+			)
+	
+		[1] => Array
+			(
+				[name] => Some Other List
+				[id] => 7654321
+			)
+	
+	)
+
+### Get List
+
+Returns an array of all available lists
+
+Params:
+
+* list_id (string, required)
+
+Usage:
+	
+	<?php
+	
+		include "wunderlist.php";
+		
+		$wunderlist = new Wunderlist("your_email", "your_password");
+	
+		$wunderlist->get_list("list_id");
+	
+	?>
+	
+Example Output:
+
+	Array
+	(
+		[todo] => Array
+			(
+				[0] => Array
+					(
+						[task] => 123456
+						[note] => NULL
+						[date] => 1319407200
+						[name] => Do something else
+					)
+					
+				[1] => Array
+					(
+						[task] => 123456
+						[note] => NULL
+						[date] => NULL
+						[name] => Download wunderlist
+					)
+			)
+	
+		[done] => Array
+			(
+				[0] => Array
+					(
+						[task] => 123456
+						[note] => Additional notes...
+						[date] => 1319407200
+						[name] => Download Wunderlist php sdk
+						[done] => 3
+					)
+			)
+	)
+	
+The output is divided into 2 arrays. "todo" array contains tasks that are not completed yet, instead "done" contains completed ones. 
+
+In "done" array you will see "done" key. That indicates how many days ago a task is completed. In this example case "Download Wunderlist php sdk" has been completed 3 days ago.
+
+In both "todo" and "done" arrays there is a key called "task". That is your task id. You will need it in case you want to update or delete it.
+
+If there are no notes attached to the task or no due date specified NULL value is returned.
