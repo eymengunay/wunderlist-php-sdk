@@ -13,7 +13,7 @@ class Wunderlist
 	var $email;
 	var $password;
 	var $login_url 		= "http://www.wunderlist.com/ajax/user";
-	var $cookie_file 	= "./cookies/cookie.txt";
+	var $cookie_file 	= "./cookie.txt";
 	var $user_agent	= "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/535.2 (KHTML, like Gecko) Chrome/15.0.874.106 Safari/535.2";
 	
 	function __construct($email, $password)
