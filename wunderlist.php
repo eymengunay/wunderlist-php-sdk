@@ -13,7 +13,7 @@ class Wunderlist
 	var $email;
 	var $password;
 	var $login_url 		= "http://www.wunderlist.com/ajax/user";
-	var $cookie_file 	= "./cookie.txt";
+	var $cookie_file 	= "./cookies/cookie.txt";
 	var $user_agent	= "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/535.2 (KHTML, like Gecko) Chrome/15.0.874.106 Safari/535.2";
 	
 	function __construct($email, $password)
@@ -33,7 +33,17 @@ class Wunderlist
 		if (file_exists($this->cookie_file) && is_readable($this->cookie_file))
 		{
 			$handle = fopen($this->cookie_file, "r");
-			$read = fread($handle, filesize($this->cookie_file));
+			$expr = "";
+			while (($buffer = fgets($handle, 4096)) !== false)
+			{
+				$expr = $buffer . "\n";
+			}
+			$expr = explode(",", str_replace("	", ",", $expr));
+			$expr = $expr[4];
+			if (time() < $expr)
+			{
+				$login_required = FALSE;	
+			}
 		}
 		else
 		{
@@ -48,6 +58,7 @@ class Wunderlist
 		}
 		if ($login_required === TRUE)
 		{
+			echo "login";
 			$login = $this->_login();	
 			$login = json_decode($login);
 			if ($login->code == 202)
