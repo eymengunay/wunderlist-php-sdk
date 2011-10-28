@@ -90,13 +90,15 @@ Function will return "success" or "error"
 
 ### Update task
 
+Updates "name", "note", "date" or "important" values of given task.
+
 Params:
 
 * task_id (string, required)
 * params (array, required. Possible array keys are: "name", "note", "date" and "important")
 
 All values of params must be string not integer!
-You have to pass at least array key, all keys are optional.
+You have to pass at least one array key, all keys are optional.
 
 Usage:
 	
@@ -112,5 +114,43 @@ Usage:
 			"date" => "1323415672",
 			"important" => "1"
 		));
+	
+	?>
+	
+### Badge counts
+
+It will return an associative array with "overdue" and "today" keys
+
+Params:
+* No params required
+
+Usage:
+	
+	<?php
+	
+		include "wunderlist.php";
+		
+		$wunderlist = new Wunderlist("your_email", "your_password");
+	
+		$wunderlist->count_badge();
+	
+	?>
+	
+### List count
+
+It will return an integer that shows no. of tasks in given list
+
+Params:
+* list_id (string, required)
+
+Usage:
+	
+	<?php
+	
+		include "wunderlist.php";
+		
+		$wunderlist = new Wunderlist("your_email", "your_password");
+	
+		$wunderlist->count_list("list_id");
 	
 	?>
