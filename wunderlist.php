@@ -1,28 +1,30 @@
 <?php
 
 /*
- * Unofficial Wunderlist PHP SDK
- *
- * @author: Eymen Gunay
- * @mail: eymen@egunay.com
- * @web: egunay.com
- *
- */
+* Unofficial Wunderlist PHP SDK
+*
+* @author: Eymen Gunay
+* @mail: eymen@egunay.com
+* @web: egunay.com
+*
+*/
 class Wunderlist
 {
 	var $email;
 	var $password;
-	var $login_url 		= "http://www.wunderlist.com/ajax/user";
-	var $cookie_file 	= "./cookies/cookie.txt";
+	var $login_url = "http://www.wunderlist.com/ajax/user";
+	var $cookie_file = "cookie.txt";
 	var $user_agent	= "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/535.2 (KHTML, like Gecko) Chrome/15.0.874.106 Safari/535.2";
-	
-	function __construct($email, $password)
+
+	function __construct($params)
 	{
+		$email = $params[0];
+		$password = $params[1];
 		// Set username & password
 		if (isset($email) && isset($password))
 		{
-			$this->email 			= $email;
-			$this->password 	= $password;	
+			$this->email = $email;
+			$this->password = $password;	
 		}
 		else
 		{	
@@ -38,11 +40,17 @@ class Wunderlist
 			{
 				$expr = $buffer . "\n";
 			}
-			$expr = explode(",", str_replace("	", ",", $expr));
-			$expr = $expr[4];
-			if (time() < $expr)
+			if(!empty($expr))
 			{
-				$login_required = FALSE;	
+				$expr = str_replace("\t", ",", $expr);
+				if(!empty($expr))
+				{
+					$expr = $expr[4];
+					if (time() < $expr)
+					{
+						$login_required = FALSE;	
+					}
+				}
 			}
 		}
 		else
@@ -58,8 +66,7 @@ class Wunderlist
 		}
 		if ($login_required === TRUE)
 		{
-			echo "login";
-			$login = $this->_login();	
+			$login = $this->_login();
 			$login = json_decode($login);
 			if ($login->code == 202)
 			{
@@ -71,34 +78,34 @@ class Wunderlist
 			}
 		}
 	}
-	
+
 	private function _login()
 	{
-		$email_input_name 		= "email";
-		$password_input_name 	= "password";
-		
-		$params[$email_input_name] 			= $this->email;
-		$params[$password_input_name] 	= md5($this->password);
-		
+		$email_input_name = "email";
+		$password_input_name = "password";
+
+		$params[$email_input_name] = $this->email;
+		$params[$password_input_name] = md5($this->password);
+
 		return $this->_curl($this->login_url, $this->_serialize($params));
 	}
 	/*
-	 * Deletes a task
-	 *
-	 * Usage: delete_task(task_id, list_id)
-	 * You have to specify both task and list ids.
-	 * It will return "success" or "error"
-	 *
-	 * @param: string
-	 * @param: string
-	 * @return: string
-	 */
+	* Deletes a task
+	*
+	* Usage: delete_task(task_id, list_id)
+	* You have to specify both task and list ids.
+	* It will return "success" or "error"
+	*
+	* @param: string
+	* @param: string
+	* @return: string
+	*/
 	public function delete_task($task_id, $list_id)
 	{
 		$params = array(
-			"id" 			=> "" . $task_id . "",
-			"list_id" 	=> "" . $list_id . "",
-			"deleted" 	=> "" . 1 . ""
+			"id" => "" . $task_id . "",
+			"list_id" => "" . $list_id . "",
+			"deleted" => "" . 1 . ""
 		);
 		$json = json_encode($params);
 		$params = array("task" => $json);
@@ -115,16 +122,16 @@ class Wunderlist
 		}
 	}
 	/*
-	 * Updates a task
-	 *
-	 * Usage: update_task(task_id, param array)
-	 * Param array accepts: name, note, date and important
-	 * Example Usage: update_task("123456", array("name" => "New Name", "note" => "Some note", "date" => "1323415672", "important" => "1"));
-	 *
-	 * @param: string
-	 * @param: array
-	 * @return: string
-	 */
+	* Updates a task
+	*
+	* Usage: update_task(task_id, param array)
+	* Param array accepts: name, note, date and important
+	* Example Usage: update_task("123456", array("name" => "New Name", "note" => "Some note", "date" => "1323415672", "important" => "1"));
+	*
+	* @param: string
+	* @param: array
+	* @return: string
+	*/
 	public function update_task($id, $params)
 	{
 		$json = json_encode($params);
@@ -142,17 +149,17 @@ class Wunderlist
 		}
 	}
 	/*
-	 * Adds a new task
-	 *
-	 * Usage: add_task(list_id, name, date)
-	 * Date param is optional. Use it only if you want to set a due date
-	 * Example Usage: add_task("123456", "My new task name", "1323415672");
-	 *
-	 * @param: string
-	 * @param: string
-	 * @param: string
-	 * @return: string
-	 */
+	* Adds a new task
+	*
+	* Usage: add_task(list_id, name, date)
+	* Date param is optional. Use it only if you want to set a due date
+	* Example Usage: add_task("123456", "My new task name", "1323415672");
+	*
+	* @param: string
+	* @param: string
+	* @param: string
+	* @return: string
+	*/
 	public function add_task($list_id, $name, $date = NULL)
 	{
 		$params = array(
@@ -177,14 +184,112 @@ class Wunderlist
 			return "error";	
 		}
 	}
+
 	/*
-	 * Returns badge counts
-	 *
-	 * Usage: count_badge()
-	 * It will return an associative array with "overdue" and "today" keys
-	 *
-	 * @return: array
-	 */
+	* Adds a new list
+	*
+	* Usage: add_list(name)
+	* Date param is optional. Use it only if you want to set a due date
+	* Example Usage: add_task("123456", "My new task name", "1323415672");
+	*
+	* @param: string
+	* @return: string
+	* @author: James Mountford
+	*/
+	public function add_list($name)
+	{
+		$params = array(
+			"name" => $name,
+		);
+		$json = json_encode($params);
+		$params = array("list" => $json);
+		$serialized = $this->_serialize($params);
+		$return = $this->_curl("http://www.wunderlist.com/ajax/lists/insert/", $serialized);
+		$return = json_decode($return);
+		if ($return->status == "success")
+		{
+			return $return->id;
+		}
+		else
+		{
+			return "error";	
+		}
+	}
+
+	/*
+	* Removes a list
+	*
+	* Usage: remove_list(list_id)
+	* Date param is optional. Use it only if you want to set a due date
+	* Example Usage: remove_list(123456);
+	*
+	* @param: string
+	* @return: string
+	* @author: James Mountford
+	*/
+	public function remove_list($id)
+	{
+		$params = array(
+			"id" => $id,
+			"deleted" => 1,
+		);
+		$json = json_encode($params);
+		$params = array("list" => $json);
+		$serialized = $this->_serialize($params);
+		$return = $this->_curl("http://www.wunderlist.com/ajax/lists/update/", $serialized);
+		$return = json_decode($return);
+		if ($return->status == "success")
+		{
+			return true;
+		}
+		else
+		{
+			return false;	
+		}
+	}
+
+	/*
+	* Updates a list
+	*
+	* Usage: update_list(list_id, name)
+	* Date param is optional. Use it only if you want to set a due date
+	* Example Usage: update_list(123456, "Test");
+	*
+	* @param: string
+	* @param: string
+	* @return: string
+	* @author: James Mountford
+	*/
+	public function update_list($id, $name)
+	{
+		$params = array(
+			"id" => $id,
+			"name" => $name,
+		);
+		$json = json_encode($params);
+		$params = array("list" => $json);
+		$serialized = $this->_serialize($params);
+		$return = $this->_curl("http://www.wunderlist.com/ajax/lists/update/", $serialized);
+		$return = json_decode($return);
+		if ($return->status == "success")
+		{
+			return $return->id;
+		}
+		else
+		{
+			return "error";	
+		}
+	}
+
+
+	/*
+	* Returns badge counts
+	*
+	* Usage: count_badge()
+	* It will return an associative array with "overdue" and "today" keys
+	*
+	* @return: array
+	*/
 	public function count_badge()
 	{
 		$url = "http://www.wunderlist.com/ajax/tasks/badgecounts/";
@@ -193,8 +298,8 @@ class Wunderlist
 		$data = json_decode($data);
 		if ($data->status == "success")
 		{
-			$return['overdue'] 	= $data->overdue;
-			$return['today']		= $data->today;
+			$return['overdue'] = $data->overdue;
+			$return['today']	= $data->today;
 			return $return;
 		}
 		else
@@ -203,13 +308,13 @@ class Wunderlist
 		}
 	}
 	/*
-	 * Returns task count of a specified list
-	 *
-	 * Usage: count_list(list_id)
-	 * It will return an integer
-	 *
-	 * @return: int
-	 */
+	* Returns task count of a specified list
+	*
+	* Usage: count_list(list_id)
+	* It will return an integer
+	*
+	* @return: int
+	*/
 	public function count_list($id)
 	{
 		$url = "http://www.wunderlist.com/ajax/lists/count/" . $id;
@@ -225,27 +330,27 @@ class Wunderlist
 		}
 	}
 	/*
-	 * Get list tasks
-	 *
-	 * Usage: get_list(list_id)
-	 * It will return an associative array with all information.
-	 * Example output:
-	 * Array
-	 *		todo
-	 *			0
-	 *				task => task_id
-	 *				note => task_note
-	 *				date => task_due_date
-	 *				name => task_name
-	 *		done
-	 *			0
-	 *				task => task_id
-	 *				note => task_note
-	 *				date => task_due_date
-	 *				name => task_name
-	 *
-	 * @return: array
-	 */
+	* Get list tasks
+	*
+	* Usage: get_list(list_id)
+	* It will return an associative array with all information.
+	* Example output:
+	* Array
+	* todo
+	* 0
+	* task => task_id
+	* note => task_note
+	* date => task_due_date
+	* name => task_name
+	* done
+	* 0
+	* task => task_id
+	* note => task_note
+	* date => task_due_date
+	* name => task_name
+	*
+	* @return: array
+	*/
 	public function get_list($list_id)
 	{
 		$url = "http://www.wunderlist.com/ajax/lists/id/" . $list_id;
@@ -253,20 +358,25 @@ class Wunderlist
 		$data = json_decode($data);
 		if ($data->status == "success")
 		{
+			$return = array();
 			$dom = new DOMDocument();
-			$dom->loadHTML($data->data);
-			$uls = $dom->getElementsByTagName("ul");
-			$i = 0;
-			foreach ($uls as $ul)
+			$dom->strictErrorChecking = false;
+			libxml_use_internal_errors(true);
+			if(!empty($data->data))
 			{
-				if (strpos($ul->getAttribute("class"), "mainlist") !== FALSE)
+				$dom->loadHTML($data->data);
+				$uls = $dom->getElementsByTagName("ul");
+				$i = 0;
+				foreach ($uls as $ul)
 				{
+					if (strpos($ul->getAttribute("class"), "mainlist") !== FALSE)
+					{
 					$list = "todo";
-				}
-				elseif ($ul->getAttribute("class") == "donelist")
-				{
+					}
+					elseif ($ul->getAttribute("class") == "donelist")
+					{
 					$list = "done";	
-				}
+					}
 				foreach ($ul->getElementsByTagName("li") as $li)
 				{
 					$return[$list][$i]['task'] = $li->getAttribute("id");
@@ -292,33 +402,38 @@ class Wunderlist
 						$return[$list][$i]['done'] = str_replace("donelist_", "", $ul->getAttribute("id"));	
 					}
 					$i++;
+					}
+					if (strpos($ul->getAttribute("class"), "mainlist") !== FALSE)
+					{
+						$i = 0;
+					}
 				}
-				if (strpos($ul->getAttribute("class"), "mainlist") !== FALSE)
-				{
-					$i = 0;
-				}
+				$old_list = $dom->getElementsByTagName("donelist");
+				return $return;
 			}
-			$old_list = $dom->getElementsByTagName("donelist");
-			return $return;
+			else
+			{
+			return "Error";	
+			}
 		}
 		else
 		{
-			return "Error";	
+			return 'empty';
 		}
 	}
 	/*
-	 * Returns an array of all available lists
-	 *
-	 * Usage: get_lists()
-	 * It will return an array
-	 * Example Output:
-	 * Array
-	 *		0
-	 *			name => List name
-	 *			id		 => List id
-	 *
-	 * @return: array
-	 */
+	* Returns an array of all available lists
+	*
+	* Usage: get_lists()
+	* It will return an array
+	* Example Output:
+	* Array
+	* 0
+	* name => List name
+	* id => List id
+	*
+	* @return: array
+	*/
 	public function get_lists()
 	{
 		$html = $this->_curl("http://www.wunderlist.com/home", NULL, "GET", FALSE);
@@ -339,7 +454,7 @@ class Wunderlist
 			$return[$i]['id'] = str_replace("list", "" , $a->getAttribute("id"));
 			$i++;	
 		}
-		
+
 		return $return;
 	}
 	private function _serialize($array)
