@@ -218,7 +218,68 @@ Usage:
 		));
 	
 	?>
+
+### Add list
+
+Params:
+
+* name (string, required) 
+
+Usage:
+
+	<?php
 	
+		include "wunderlist.php";
+		
+		$wunderlist = new Wunderlist("your_email", "your_password");
+	
+		$wunderlist->add_list("My new task name");
+	
+	?>
+	
+If no error occurs, the function will return the id of inserted list, otherwise it will return a string: "error"
+
+### Remove list
+
+Params:
+
+* id (string, required) 
+
+Usage:
+
+	<?php
+	
+		include "wunderlist.php";
+		
+		$wunderlist = new Wunderlist("your_email", "your_password");
+	
+		$wunderlist->remove_list(58441240);
+	
+	?>
+	
+If no error occurs, the function will return boolean true, otherwise it will return boolean false
+
+### Update list
+
+Params:
+
+* id (string, required)
+* name (string, required) 
+
+Usage:
+
+	<?php
+	
+		include "wunderlist.php";
+		
+		$wunderlist = new Wunderlist("your_email", "your_password");
+	
+		$wunderlist->update_list(58441240, "An updated list name");
+	
+	?>
+	
+If no error occurs, the function will return the id of updated list, otherwise it will return a string: "error"
+
 ### Badge counts
 
 It will return an associative array with "overdue" and "today" keys
