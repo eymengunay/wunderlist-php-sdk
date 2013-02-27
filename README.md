@@ -1,7 +1,9 @@
-Wunderlist PHP SDK
+Wunderlist 1 PHP SDK
 =============
 
-Unofficial PHP SDK for Wunderlist
+Unofficial PHP SDK for Wunderlist 1
+
+### Warning: This is not for Wunderlist 2! It is an old experiment with Wunderlist 1.
 
 Quickstart
 -------
